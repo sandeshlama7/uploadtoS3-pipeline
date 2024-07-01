@@ -133,4 +133,4 @@ jobs:
           instance-ids: ${{ env.INSTANCE_ID }}
 
           working-directory: home/ec2-user/simple_todo
-          command: sudo /bin/sh /home/ec2-user/simple_todo/nodestart.sh
+          command: sudo /bin/bash /home/ec2-user/simple_todo/nodestart.sh
