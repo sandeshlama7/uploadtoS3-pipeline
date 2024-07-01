@@ -120,7 +120,7 @@ jobs:
           working-directory: home/ec2-user
           command: |
             mkdir /home/ec2-user/simple_todo
-            aws s3 cp s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo/ --recursive
+            aws s3 sync s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo/
 
       - name: Run the bash script
         uses: adexltd/aws-ssm-send-command@master
