@@ -3,8 +3,9 @@ name: Infrastructure setup
 run-name: ${{ github.actor }} is uploading files to S3
 
 on:
-  push:
-    branches: [ "INTERN-77-" ]
+  workflow_dispatch:
+  # push:
+  #   branches: [ "INTERN-77-" ]
 
 jobs:
   infra_setup:
