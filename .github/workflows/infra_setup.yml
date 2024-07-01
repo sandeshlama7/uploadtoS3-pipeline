@@ -78,10 +78,10 @@ jobs:
             state_file_name=sandesh/terraform.tfstate
             aws s3 cp s3://8586-terraform-state/sandesh/terraform.tfstate $state_file_name
             instance_id=$(terraform output --json -state=$state_file_name | jq -r '.instance_id.value')
-            echo "INSTANCE_ID=$instance_id" >> "$GITHUB_OUTPUT"
+            echo "INSTANCE_ID=$instance_id" >> "$GITHUB_ENV"
 
       - name: Echo Instance ID
-        run: echo " ${{ steps.get-instance-id.outputs.INSTANCE_ID }}"
+        run: echo " ${{ env.INSTANCE_ID }}"
 
       - name: Fetching Code to EC2
         uses: adexltd/aws-ssm-send-command@master
@@ -91,9 +91,9 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          instance-ids: ${{ steps.get-instance-id.outputs.INSTANCE_ID }}
+          instance-ids: ${{ env.INSTANCE_ID }}
 
           # working-directory: home/ubuntu/simple_todo
           command: |
             mkdir /home/ec2-user/simple_todo
-            aws s3 cp s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo --recursive
+            aws s3 cp s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo/ --recursive
