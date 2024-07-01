@@ -26,8 +26,8 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: Terraform
+        working-directory: terraform
 
       - name: Terraform Destroy
         run: terraform destroy -var-file=./dev.tfvars -auto-approve
-        working-directory: Terraform
+        working-directory: terraform
