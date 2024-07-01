@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cd /home/ec2-user/simple_todo
 #Install node app dependencies
 npm install
 
