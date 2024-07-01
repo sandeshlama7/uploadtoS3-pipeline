@@ -37,7 +37,7 @@ jobs:
 
   upload_to_s3:
     runs-on: ubuntu-latest
-    needs: infra_setup
+    # needs: infra_setup
 
     steps:
       - uses: actions/checkout@v4
@@ -81,8 +81,8 @@ jobs:
 
   fetch_from_s3:
     runs-on: ubuntu-latest
-    # needs:
-    #   - upload_to_s3
+    needs:
+      - upload_to_s3
     #   - ansible_configure
 
     steps:
