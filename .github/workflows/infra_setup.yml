@@ -62,13 +62,21 @@ jobs:
     needs: upload_to_s3
 
     steps:
+      - name: AWS creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
       - name: Get the instance-id
-        uses: mathiasvr/command-output@v1
+        uses: mathiasvr/command-output@v2.0.0
         id: get-instance-id
         with:
           run: |
             state_file_name=sandesh/terraform.tfstate
             aws s3 cp s3://8586-terraform-state/sandesh/terraform.tfstate $state_file_name
             instance_id=$(terraform output --json -state=$state_file_name | jq -r '.instance_id.value')
-            echo "INSTANCE_ID=$instance_id" >> "$GITHUB_OUTPUT"
+            echo "INSTANCE_ID=$instance_id" >> "$GITHUB_ENV"
             echo $INSTANCE_ID
