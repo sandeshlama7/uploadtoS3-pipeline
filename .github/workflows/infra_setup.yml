@@ -8,58 +8,58 @@ on:
     branches: [ "INTERN-77-" ]
 
 jobs:
-  infra_setup:
-    runs-on: ubuntu-latest
+  # infra_setup:
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Install Terraform on Runner
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_wrapper: false
+  #     - name: Install Terraform on Runner
+  #       uses: hashicorp/setup-terraform@v3
+  #       with:
+  #         terraform_wrapper: false
 
-      - name: export AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
+  #     - name: export AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+  #         aws-region: us-east-1
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform
+  #     - name: Terraform Init
+  #       run: terraform init
+  #       working-directory: terraform
 
-      - name: Terraform apply
-        run: terraform apply -var-file=./dev.tfvars -auto-approve -no-color
-        working-directory: terraform
+  #     - name: Terraform apply
+  #       run: terraform apply -var-file=./dev.tfvars -auto-approve -no-color
+  #       working-directory: terraform
 
-  upload_to_s3:
-    runs-on: ubuntu-latest
-    needs: infra_setup
-    steps:
-      # - name: Verify snap is present
-      #   run:
-      - uses: actions/checkout@v4
+  # upload_to_s3:
+  #   runs-on: ubuntu-latest
+  #   needs: infra_setup
+  #   steps:
+  #     # - name: Verify snap is present
+  #     #   run:
+  #     - uses: actions/checkout@v4
 
-      - name: Install awscli
-        run: sudo snap install aws-cli --classic
+  #     - name: Install awscli
+  #       run: sudo snap install aws-cli --classic
 
-      - name: export AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
+  #     - name: export AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+  #         aws-region: us-east-1
 
-      - name: Upload Code to S3
-        run: aws s3 cp nodeapp/ s3://8586-terraform-state/nodeapp-sandesh --recursive
+  #     - name: Upload Code to S3
+  #       run: aws s3 cp nodeapp/ s3://8586-terraform-state/nodeapp-sandesh --recursive
 
   fetch_from_s3:
     runs-on: ubuntu-latest
-    needs: upload_to_s3
+    # needs: upload_to_s3
 
     steps:
       - name: AWS creds
@@ -79,4 +79,4 @@ jobs:
             aws s3 cp s3://8586-terraform-state/sandesh/terraform.tfstate $state_file_name
             instance_id=$(terraform output --json -state=$state_file_name | jq -r '.instance_id.value')
             echo "INSTANCE_ID=$instance_id" >> "$GITHUB_ENV"
-            echo $INSTANCE_ID
+            echo ${{ env.INSTANCE_ID }}
