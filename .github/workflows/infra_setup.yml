@@ -136,3 +136,8 @@ jobs:
           command: |
             chmod +x nodestart.sh
             sudo /bin/sh nodestart.sh
+
+      - name: Check script execution
+        run: |
+          echo "SSM Command Status: ${{ steps.Run-deployment-script.outputs.status }}"
+          echo "SSM Command Output: ${{ steps.Run-deployment-script.outputs.output }}"
