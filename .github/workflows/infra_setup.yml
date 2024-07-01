@@ -79,4 +79,7 @@ jobs:
             aws s3 cp s3://8586-terraform-state/sandesh/terraform.tfstate $state_file_name
             instance_id=$(terraform output --json -state=$state_file_name | jq -r '.instance_id.value')
             echo "INSTANCE_ID=$instance_id" >> "$GITHUB_ENV"
-            echo ${{ env.INSTANCE_ID }}
+
+      - name: Use INSTANCE_ID
+        run: echo "The instance ID is ${{ env.INSTANCE_ID }}"
+
