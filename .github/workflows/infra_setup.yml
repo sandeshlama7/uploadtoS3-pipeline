@@ -133,9 +133,7 @@ jobs:
           instance-ids: ${{ env.INSTANCE_ID }}
 
           working-directory: home/ec2-user/simple_todo
-          command: |
-            chmod +x nodestart.sh
-            sudo /bin/sh nodestart.sh
+          command: sudo /bin/bash nodestart.sh
 
       - name: Check script execution
         run: |
