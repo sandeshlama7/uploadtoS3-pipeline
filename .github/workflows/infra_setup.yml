@@ -59,7 +59,7 @@ jobs:
 
   fetch_from_s3:
     runs-on: ubuntu-latest
-    # needs: upload_to_s3
+    needs: upload_to_s3
 
     steps:
       - name: AWS creds
