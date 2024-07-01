@@ -4,8 +4,8 @@ run-name: ${{ github.actor }} is uploading files to S3
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [ "INTERN-77-" ]
+  push:
+    branches: [ "INTERN-77-" ]
 
 jobs:
   infra_setup:
@@ -56,3 +56,19 @@ jobs:
 
       - name: Upload Code to S3
         run: aws s3 cp nodeapp/ s3://8586-terraform-state/nodeapp-sandesh --recursive
+
+  fetch_from_s3:
+    runs-on: ubuntu-latest
+    # needs: infra_setup
+
+    steps:
+      - name: Get the instance-id
+        uses: mathiasvr/command-output@v1
+        id: get-instance-id
+        with:
+          run: |
+            state_file_name=sandesh/terraform.tfstate
+            aws s3 cp s3://8586-terraform-state/sandesh/terraform.tfstate $state_file_name
+            instance_id=$(terraform output --json -state=$state_file_name | jq -r '.instance_id.value')
+            echo "INSTANCE_ID=$instance_id" >> "$GITHUB_OUTPUT"
+            echo $INSTANCE_ID
