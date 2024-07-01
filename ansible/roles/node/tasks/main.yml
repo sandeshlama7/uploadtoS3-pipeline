@@ -17,8 +17,8 @@
     global: yes
     state: present
 
-- name: Install Node App Dependencies
-  command: npm install
-  args:
-    chdir: /home/ec2-user/sample_todo
-  notify: Run the node app
+# - name: Install Node App Dependencies
+#   command: npm install
+#   args:
+#     chdir: /home/ec2-user/sample_todo
+#   notify: Run the node app

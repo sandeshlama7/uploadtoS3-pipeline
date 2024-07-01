@@ -51,6 +51,10 @@ data "aws_iam_policy" "ssm_ec2" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }
 
+data "aws_iam_policy" "s3readonly" {
+  arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
 resource "aws_iam_role" "iam" {
   name = "IAM-Sandesh"
   assume_role_policy = jsonencode({
@@ -70,6 +74,11 @@ resource "aws_iam_role" "iam" {
 resource "aws_iam_role_policy_attachment" "attach_ssm_role" {
   role       = aws_iam_role.iam.name
   policy_arn = data.aws_iam_policy.ssm_ec2.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_s3readonly_role" {
+  role       = aws_iam_role.iam.name
+  policy_arn = data.aws_iam_policy.s3readonly.arn
 }
 
 resource "aws_iam_instance_profile" "iam_instance_profile" {
