@@ -4,7 +4,7 @@ run-name: Destroying the Infrastructure
 on:
   workflow_dispatch:
   push:
-    branches = ["INTERN-77-"]
+    branches: ["INTERN-77-"]
 
 jobs:
   destroy_infra:
