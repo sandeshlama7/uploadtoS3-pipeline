@@ -132,5 +132,5 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           instance-ids: ${{ env.INSTANCE_ID }}
 
-          working-directory: home/ec2-user/sample_todo
-          command: /bin/bash /home/ec2-user/sample_todo/nodestart.sh
+          working-directory: home/ec2-user/simple_todo
+          command: /bin/bash nodestart.sh
