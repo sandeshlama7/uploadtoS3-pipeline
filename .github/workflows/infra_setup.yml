@@ -94,4 +94,6 @@ jobs:
           instance-ids: ${{ steps.get-instance-id.outputs.INSTANCE_ID }}
 
           # working-directory: home/ubuntu/simple_todo
-          command: aws s3 cp s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo --recursive
+          command: |
+            mkdir /home/ec2-user/simple_todo
+            aws s3 cp s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo --recursive
