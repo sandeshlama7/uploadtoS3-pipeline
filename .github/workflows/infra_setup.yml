@@ -1,6 +1,6 @@
 name: Infrastructure setup
 
-run-name: ${{ github.actor }} is uploading files to S3
+run-name: ${{ github.actor }} is testing the pipeline
 
 on:
   workflow_dispatch:
