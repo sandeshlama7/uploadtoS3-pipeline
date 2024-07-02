@@ -8,82 +8,59 @@ on:
     branches: [ "INTERN-77-" ]
 
 jobs:
-  # infra_setup:
-  #   runs-on: ubuntu-latest
+  infra_setup:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Install Terraform on Runner
-  #       uses: hashicorp/setup-terraform@v3
-  #       with:
-  #         terraform_wrapper: false
+      - name: Install Terraform on Runner
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
-  #     - name: export AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: us-east-1
+      - name: export AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
 
-  #     - name: Terraform Init
-  #       run: terraform init
-  #       working-directory: terraform
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform
 
-  #     - name: Terraform apply
-  #       run: terraform apply -var-file=./dev.tfvars -auto-approve -no-color
-  #       working-directory: terraform
+      - name: Terraform apply
+        run: terraform apply -var-file=./dev.tfvars -auto-approve -no-color
+        working-directory: terraform
 
-  # upload_to_s3:
-  #   runs-on: ubuntu-latest
-  #   # needs: infra_setup
+  upload_to_s3:
+    runs-on: ubuntu-latest
+    needs: infra_setup
 
-  #   steps:
-  #     - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Install awscli
-  #       run: sudo snap install aws-cli --classic
+      - name: Install awscli
+        run: sudo snap install aws-cli --classic
 
-  #     - name: export AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: us-east-1
+      - name: export AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
 
-  #     - name: Upload Code to S3
-  #       run: aws s3 cp nodeapp/ s3://8586-terraform-state/nodeapp-sandesh --recursive
+      - name: Upload Code to S3
+        run: aws s3 cp nodeapp/ s3://8586-terraform-state/nodeapp-sandesh --recursive
 
-  # ansible_configure:
-  #   runs-on: ubuntu-latest
-  #   needs: infra_setup
-
-  #   steps:
-  #     - name: Checkout Git Repo
-  #       uses: actions/checkout@v4
-
-  #     - name: AWS Creds
-  #       uses: aws-actions/configure-aws-credentials@v4
-  #       with:
-  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-  #         aws-region: us-east-1
-
-  #     - name: Install ansible, boto3 and botocore
-  #       run: pip3 install ansible boto3 botocore
-
-  #     - name: Run Ansible Playbook
-  #       run: ansible-playbook -i aws_ec2.yml playbook.yml
-  #       working-directory: ansible
 
   fetch_from_s3:
     runs-on: ubuntu-latest
-    # needs:
-    #   - upload_to_s3
-    #   - ansible_configure
+    needs:
+      - upload_to_s3
 
     steps:
       - name: AWS creds
@@ -122,17 +99,42 @@ jobs:
             mkdir /home/ec2-user/simple_todo
             aws s3 sync s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo/
 
-      - name: Run the bash script
-        uses: adexltd/aws-ssm-send-command@master
-        id: Run-deployment-script
+      # - name: Run the bash script
+      #   uses: adexltd/aws-ssm-send-command@master
+      #   id: Run-deployment-script
+      #   with:
+      #     aws-region: us-east-1
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+      #     instance-ids: ${{ env.INSTANCE_ID }}
+
+      #     working-directory: home/ec2-user/simple_todo
+      #     command: |
+      #       chmod +x nodestart.sh
+      #       /bin/sh /home/ec2-user/simple_todo/nodestart.sh
+
+  ansible_configure:
+    runs-on: ubuntu-latest
+    needs:
+      - infra_setup
+      - fetch_from_s3
+
+    steps:
+      - name: Checkout Git Repo
+        uses: actions/checkout@v4
+
+      - name: AWS Creds
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          instance-ids: ${{ env.INSTANCE_ID }}
+          aws-region: us-east-1
 
-          working-directory: home/ec2-user/simple_todo
-          command: |
-            chmod +x nodestart.sh
-            /bin/sh /home/ec2-user/simple_todo/nodestart.sh
+      - name: Install ansible, boto3 and botocore
+        run: pip3 install ansible boto3 botocore
+
+      - name: Run Ansible Playbook
+        run: ansible-playbook -i aws_ec2.yml playbook.yml
+        working-directory: ansible
