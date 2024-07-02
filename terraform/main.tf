@@ -20,13 +20,6 @@ resource "aws_security_group" "sg" {
   tags = {
     Name = var.names.sg
   }
-  # ingress {
-  #   description = "Allow HTTP"
-  #   cidr_blocks = local.cidr_all
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  # }
   ingress {
     description = "Node App Port"
     cidr_blocks = local.cidr_all
@@ -85,3 +78,17 @@ resource "aws_iam_instance_profile" "iam_instance_profile" {
   name = "Sandesh_Instance_Profile"
   role = aws_iam_role.iam.name
 }
+
+# data "aws_ami" "ami-amzlinux" {
+#   most_recent = true
+#   owners = ["amazon"]
+#   filter {
+#     name = name
+#     values =
+#   }
+#       filter {
+#         name   = "virtualization-type"
+#         values = ["hvm"]
+#     }
+
+# }
