@@ -1,0 +1,5 @@
+---
+- name: Run the node app
+  shell: pm2 start server.js
+  args:
+    chdir: /home/ec2-user/simple_todo
