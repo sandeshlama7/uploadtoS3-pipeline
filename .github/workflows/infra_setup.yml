@@ -15,7 +15,7 @@ env:
   s3bucket: 8586-terraform-state
   s3tf_dir: sandesh
   s3tf_statefile: terraform.tfstate
-  s3app_dir: node-sandesh
+  s3app_dir: nodeapp-sandesh
 
 jobs:
   infra_setup:
@@ -107,7 +107,7 @@ jobs:
           working-directory: home/ec2-user
           command: |
             mkdir /home/ec2-user/simple_todo
-            aws s3 sync s3://$s3bucket/$s3app_dir /home/ec2-user/simple_todo/ 
+            aws s3 cp s3://$s3bucket/$s3app_dir/ /home/ec2-user/simple_todo/ --recursive
 
   ansible_configure:
     runs-on: ubuntu-latest
