@@ -104,11 +104,10 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           instance-ids: ${{ env.INSTANCE_ID }}
 
-          working-directory: home/ec2-user
+          working-directory: /home/ec2-user/
           command: |
             mkdir /home/ec2-user/simple_todo
-            # chmod 777 /home/ec2-user/simple_todo
-            aws s3 cp s3://$s3bucket/$s3app_dir /home/ec2-user/simple_todo --recursive
+            aws s3 cp s3://${{ env.s3bucket }}/${{ env.s3app_dir }} /home/ec2-user/simple_todo --recursive
 
   # ansible_configure:
   #   runs-on: ubuntu-latest
