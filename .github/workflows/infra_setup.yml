@@ -107,7 +107,7 @@ jobs:
           working-directory: home/ec2-user
           command: |
             mkdir /home/ec2-user/simple_todo
-            aws s3 cp s3://$s3bucket/$s3app_dir /home/ec2-user/simple_todo/ --recursive
+            aws s3 sync s3://$s3bucket/$s3app_dir /home/ec2-user/simple_todo/ 
 
   ansible_configure:
     runs-on: ubuntu-latest
