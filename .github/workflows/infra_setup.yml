@@ -7,6 +7,14 @@ on:
   push:
     branches: [ "INTERN-77-" ]
 
+env:
+  tf_dir: terraform
+  ansible_dir: ansible
+  s3bucket: 8586-terraform-state
+  s3tf_dir: sandesh
+  s3tf_statefile: terraform.tfstate
+  s3app_dir: node-sandesh
+
 jobs:
   infra_setup:
     runs-on: ubuntu-latest
@@ -29,11 +37,11 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform
+        working-directory: ${{env.tf_dir}}
 
       - name: Terraform apply
         run: terraform apply -var-file=./dev.tfvars -auto-approve -no-color
-        working-directory: terraform
+        working-directory: ${{env.tf_dir}}
 
   upload_to_s3:
     runs-on: ubuntu-latest
@@ -54,7 +62,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload Code to S3
-        run: aws s3 cp nodeapp/ s3://8586-terraform-state/nodeapp-sandesh --recursive
+        run: aws s3 cp nodeapp/ s3://$s3bucket/$s3app_dir --recursive
 
 
   fetch_from_s3:
@@ -76,8 +84,8 @@ jobs:
         id: get-instance-id
         with:
           run: |
-            state_file_name=sandesh/terraform.tfstate
-            aws s3 cp s3://8586-terraform-state/sandesh/terraform.tfstate $state_file_name
+            state_file_name=$s3tf_dir/$s3tf_statefile
+            aws s3 cp s3://$s3bucket/$state_file_name $state_file_name
             instance_id=$(terraform output --json -state=$state_file_name | jq -r '.instance_id.value')
             echo "INSTANCE_ID=$instance_id" >> "$GITHUB_ENV"
 
@@ -97,22 +105,7 @@ jobs:
           working-directory: home/ec2-user
           command: |
             mkdir /home/ec2-user/simple_todo
-            aws s3 sync s3://8586-terraform-state/nodeapp-sandesh /home/ec2-user/simple_todo/
-
-      # - name: Run the bash script
-      #   uses: adexltd/aws-ssm-send-command@master
-      #   id: Run-deployment-script
-      #   with:
-      #     aws-region: us-east-1
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-      #     instance-ids: ${{ env.INSTANCE_ID }}
-
-      #     working-directory: home/ec2-user/simple_todo
-      #     command: |
-      #       chmod +x nodestart.sh
-      #       /bin/sh /home/ec2-user/simple_todo/nodestart.sh
+            aws s3 sync s3://$s3bucket/$s3app_dir /home/ec2-user/simple_todo/
 
   ansible_configure:
     runs-on: ubuntu-latest
@@ -137,4 +130,4 @@ jobs:
 
       - name: Run Ansible Playbook
         run: ansible-playbook -i aws_ec2.yml playbook.yml
-        working-directory: ansible
+        working-directory: ${{env.ansible_dir}}
