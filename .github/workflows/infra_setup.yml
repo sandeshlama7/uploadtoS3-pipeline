@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ "INTERN-77-" ]
-  pull_request:
-    branches: [ "main" ]
+  # pull_request:
+  #   branches: [ "main" ]
 
 env:
   tf_dir: terraform
@@ -107,29 +107,29 @@ jobs:
           working-directory: home/ec2-user
           command: |
             mkdir /home/ec2-user/simple_todo
-            aws s3 cp s3://$s3bucket/$s3app_dir/ /home/ec2-user/simple_todo/ --recursive
+            # chmod 777 /home/ec2-user/simple_todo
+            aws s3 cp s3://$s3bucket/$s3app_dir /home/ec2-user/simple_todo --recursive
 
-  ansible_configure:
-    runs-on: ubuntu-latest
-    needs:
-      - infra_setup
-      - fetch_from_s3
+  # ansible_configure:
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - fetch_from_s3
 
-    steps:
-      - name: Checkout Git Repo
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout Git Repo
+  #       uses: actions/checkout@v4
 
-      - name: AWS Creds
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
-          aws-region: us-east-1
+  #     - name: AWS Creds
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+  #         aws-region: us-east-1
 
-      - name: Install ansible, boto3 and botocore
-        run: pip3 install ansible boto3 botocore
+  #     - name: Install ansible, boto3 and botocore
+  #       run: pip3 install ansible boto3 botocore
 
-      - name: Run Ansible Playbook
-        run: ansible-playbook -i aws_ec2.yml playbook.yml
-        working-directory: ${{env.ansible_dir}}
+  #     - name: Run Ansible Playbook
+  #       run: ansible-playbook -i aws_ec2.yml playbook.yml
+  #       working-directory: ${{env.ansible_dir}}
