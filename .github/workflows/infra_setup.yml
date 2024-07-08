@@ -17,6 +17,10 @@ env:
   s3tf_statefile: terraform.tfstate
   s3app_dir: nodeapp-sandesh
 
+  backend-bucket: "8586-terraform-state"
+  backend-key: "sandesh/terraform.tfstate"
+  backend-region: "us-east-1"
+
 jobs:
   infra_setup:
     runs-on: ubuntu-latest
@@ -38,7 +42,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init  -backend-config="bucket=${{env.backend-bucket}}" -backend-config="key=${{env.backend-key}}" -backend-config="region=${{env.backend-region}}"
         working-directory: ${{env.tf_dir}}
 
       - name: Terraform apply
