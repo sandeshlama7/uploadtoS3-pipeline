@@ -4,8 +4,8 @@ run-name: ${{ github.actor }} is testing the pipeline
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [ "INTERN-77-", "main" ]
+  push:
+    branches: [ "INTERN-77-", "main" ]
   pull_request:
     branches: [ "main" ]
 

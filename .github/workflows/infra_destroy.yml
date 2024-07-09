@@ -6,6 +6,9 @@ on:
   # push:
   #   branches: ["INTERN-77-"]
 
+env:
+  tf_dir: terraform
+
 jobs:
   destroy_infra:
     runs-on: ubuntu-latest
@@ -26,8 +29,8 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: terraform
+        working-directory: ${{ env.tf_dir }}
 
       - name: Terraform Destroy
         run: terraform destroy -var-file=./dev.tfvars -auto-approve
-        working-directory: terraform
+        working-directory: ${{ env.tf_dir }}
