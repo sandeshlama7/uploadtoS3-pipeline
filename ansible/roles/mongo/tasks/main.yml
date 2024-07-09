@@ -1,0 +1,13 @@
+- name: Copy Mongodb Repo
+  copy:
+    src: main.yml
+    dest: /etc/yum.repos.d/mongodb-org-7.0.repo
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install mongodb-org
+  dnf:
+    name: mongodb-org
+    state: present
+  notify: Start mongo
